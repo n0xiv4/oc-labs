@@ -1,10 +1,14 @@
-#include "DML1Cache.h"
+#include "SimpleCache.h"
+
+// Explanation below
+#define L1_OFFSET_BITS 6
+#define L1_INDEX_BITS 8
 
 uint8_t L1Cache[L1_SIZE];
 uint8_t L2Cache[L2_SIZE];
 uint8_t DRAM[DRAM_SIZE];
 uint32_t time;
-Cache DML1Cache;
+Cache SimpleCache;
 
 /**************** Time Manipulation ***************/
 void resetTime() { time = 0; }
@@ -30,30 +34,47 @@ void accessDRAM(uint32_t address, uint8_t *data, uint32_t mode) {
 
 /*********************** L1 cache *************************/
 
-void initCache() { DML1Cache.init = 0; }
+void initCache() { SimpleCache.init = 0; }
 
 void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
 
-  uint32_t index, tag, MemAddress;
+  uint32_t index, offset, Tag, MemAddress;
   uint8_t TempBlock[BLOCK_SIZE];
 
   /* init cache */
-  if (DML1Cache.init == 0) {
-    // for init tag, dirty and etcs
-    DML1Cache.init = 1;
+  if (SimpleCache.init == 0) {
+    SimpleCache.line.Valid = 0;
+    SimpleCache.init = 1;
   }
 
-  printf("address: %p\n", address);
+  CacheLine *Line = &SimpleCache.line;
 
-  tag = address >> 3; // Why do I do this?
+  /* 
+  Our cache L1 has cache lines with 16 * WORD_SIZE size, so our offset
+  shall be able to have enough bits to address 16 words. 2^6 = 64 bytes
+  (16 words * 4 bytes), so we'll use 6 bits for the offset.
+  
+  As for the index, 256 lines in L1 mean that we need 2^8 = 256 indexes,
+  so, that means we'll use 8 bits for the index.
+  */
 
-  MemAddress = address >> 3; // again this....!
-  MemAddress = MemAddress << 3; // address of the block in memory (first entry!)
+  Tag = address >> (L1_OFFSET_BITS + L1_INDEX_BITS);
+  offset = address & ((1 << L1_OFFSET_BITS) - 1);
+  index = (address >> L1_OFFSET_BITS) & ((1 << L1_INDEX_BITS) - 1);
 
-  printf("tag: %p\n", tag);
-  printf("memory address: %p\n", MemAddress);
+  printf("memory address -> %p\n", address);
+  printf("tag -> %p\n", Tag);
+  printf("offset -> %p\n", offset);
+  printf("index -> %p\n", index);
 
-  CacheLine *Line = &DML1Cache.line[index];
+  /*
+  As we have 16 words in each block, we must remove the last 4 bits
+  from our address so we find the adequate place in memory for the
+  current address. 2^6=64, 2^4=16
+  */
+
+  MemAddress = address >> 4;
+  MemAddress = MemAddress << 4;
 
   /* access Cache*/
 
@@ -65,7 +86,7 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
       accessDRAM(MemAddress, &(L1Cache[0]), MODE_WRITE); // then write back old block
     }
 
-    memcpy(&(L1Cache[index]), TempBlock,
+    memcpy(&(L1Cache[0]), TempBlock,
            BLOCK_SIZE); // copy new block to cache line
     Line->Valid = 1;
     Line->Tag = Tag;
@@ -90,12 +111,6 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
     time += L1_WRITE_TIME;
     Line->Dirty = 1;
   }
-}
-
-/* FIXME changes - ADDRESS NEEDED NOT TAG */
-uint32_t indexHash(uint32_t tag) {
-  /* Finds out the index of a tag in the cache. */
-  return tag % (L1_SIZE / BLOCK_SIZE);
 }
 
 void read(uint32_t address, uint8_t *data) {
