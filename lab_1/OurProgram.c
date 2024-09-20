@@ -2,33 +2,29 @@
 
 int main() {
 
-  uint32_t value1, value2, value3, clock;
+  uint32_t value1, value2, clock;
 
   resetTime();
   initCache();
   value1 = -1;
-  value2 = 9342;
-  value3 = 43;
+  value2 = 2;
 
-  #
-  write(1, (uint8_t *)(&value1));
+  // 0x81 -> 129
+  write(129, (uint8_t *)(&value1));
 
   clock = getTime();
   printf("Time: %d\n", clock);
 
-  read(1, (uint8_t *)(&value2));
+  read(129, (uint8_t *)(&value2));
   clock = getTime();
   printf("Time: %d\n", clock);
 
-  write(512, (uint8_t *)(&value1));
+  // 0x95C9 -> 38345
+  write(38345, (uint8_t *)(&value1));
   clock = getTime();
   printf("Time: %d\n", clock);
 
-  read(512, (uint8_t *)(&value2));
-  clock = getTime();
-  printf("Time: %d\n", clock);
-
-  read(5923, (uint8_t *)(&value3));
+  read(38345, (uint8_t *)(&value2));
   clock = getTime();
   printf("Time: %d\n", clock);
 
