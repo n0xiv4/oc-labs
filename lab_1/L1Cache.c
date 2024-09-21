@@ -38,7 +38,7 @@ void initCache() { cache.init = 0; }
 
 void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
 
-  uint32_t index, offset, Tag, MemAddress, WordAddress;
+  uint32_t index, offset, Tag, MemAddress;
   uint8_t TempBlock[BLOCK_SIZE];
 
   /* init cache */

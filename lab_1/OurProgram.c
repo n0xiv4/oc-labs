@@ -19,6 +19,8 @@ int main() {
   clock = getTime();
   printf("Time: %d\n", clock);
 
+  printf("%d\n", value2);
+
   // 0x95C9 -> 38345
   write(38345, (uint8_t *)(&value1));
   clock = getTime();

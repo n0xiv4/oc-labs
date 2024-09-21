@@ -1,36 +1,51 @@
-#include "L1Cache.h"
+#include "L2Cache.h"
 
 int main() {
 
-  uint32_t value1, value2, value3, clock;
+  // set seed for random number generator
+  srand(0);
 
-  resetTime();
-  initCache();
-  value1 = -1;
-  value2 = 9342;
-  value3 = 43;
+  int clock1, value;
 
-  #
-  write(1, (uint8_t *)(&value1));
+  for(int n = 1; n <= DRAM_SIZE/4; n*=WORD_SIZE) {
 
-  clock = getTime();
-  printf("Time: %d\n", clock);
+    resetTime();
+    initL1Cache();
+    initL2Cache();
 
-  read(1, (uint8_t *)(&value2));
-  clock = getTime();
-  printf("Time: %d\n", clock);
+    printf("\nNumber of words: %d\n", (n-1)/WORD_SIZE + 1);
+    
+    for(int i = 0; i < n; i+=WORD_SIZE) {
+      write(i, (unsigned char *)(&i));
+      clock1 = getTime();
+      printf("Write; Address %d; Value %d; Time %d\n", i, i, clock1);
+    }
 
-  write(512, (uint8_t *)(&value1));
-  clock = getTime();
-  printf("Time: %d\n", clock);
+    for(int i = 0; i < n; i+=WORD_SIZE) {
+      read(i, (unsigned char *)(&value));
+      clock1 = getTime();
+      printf("Read; Address %d; Value %d; Time %d\n", i, value, clock1);
+    }  
 
-  read(512, (uint8_t *)(&value2));
-  clock = getTime();
-  printf("Time: %d\n", clock);
+  }
 
-  read(5923, (uint8_t *)(&value3));
-  clock = getTime();
-  printf("Time: %d\n", clock);
-
+  /* 
+  printf("\nRandom accesses\n");
+  for(int i = 0; i < 100; i++) {
+    int address = rand() % (DRAM_SIZE/4);
+    address = address - address % WORD_SIZE;
+    int mode = rand() % 2;
+    if (mode == MODE_READ) {
+      read(address, (unsigned char *)(&value));
+      clock1 = getTime();
+      printf("Read; Address %d; Value %d; Time %d\n", address, value, clock1);
+    }
+    else {
+      write(address, (unsigned char *)(&address));
+      clock1 = getTime();
+      printf("Write; Address %d; Value %d; Time %d\n", address, address, clock1);
+    }
+  }
+  */
   return 0;
 }
