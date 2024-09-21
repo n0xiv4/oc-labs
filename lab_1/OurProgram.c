@@ -1,34 +1,32 @@
-#include "L1Cache.h"
+#include "L2_2WCache.h"
 
 int main() {
 
   uint32_t value1, value2, clock;
 
   resetTime();
-  initCache();
-  value1 = -1;
+  initL1Cache();
+  initL2Cache();
+  value1 = 1;
   value2 = 2;
 
-  // 0x81 -> 129
-  write(129, (uint8_t *)(&value1));
+  write(0, (unsigned char *)(&value1));
+  write(16384, (unsigned char *)(&value1));
+  printf("I'm good\n");
+  write(32768, (unsigned char *)(&value1));
 
+  read(0, (unsigned char *)(&value1));
   clock = getTime();
-  printf("Time: %d\n", clock);
+  printf("Read; Address %d; Value %d; Time %d\n", 0, value1, clock);
 
-  read(129, (uint8_t *)(&value2));
+  read(16384, (unsigned char *)(&value2));
   clock = getTime();
-  printf("Time: %d\n", clock);
+  printf("Read; Address %d; Value %d; Time %d\n", 16384, value2, clock);
 
-  printf("%d\n", value2);
-
-  // 0x95C9 -> 38345
-  write(38345, (uint8_t *)(&value1));
+  read(32768, (unsigned char *)(&value2));
   clock = getTime();
-  printf("Time: %d\n", clock);
-
-  read(38345, (uint8_t *)(&value2));
-  clock = getTime();
-  printf("Time: %d\n", clock);
+  printf("Read; Address %d; Value %d; Time %d\n", 32768, value2, clock);
 
   return 0;
+
 }
