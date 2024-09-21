@@ -1,4 +1,4 @@
-#include "L2_2WCache.h"
+#include "L2Cache.h"
 
 int main() {
 
@@ -12,7 +12,6 @@ int main() {
 
   write(0, (unsigned char *)(&value1));
   write(16384, (unsigned char *)(&value1));
-  printf("I'm good\n");
   write(32768, (unsigned char *)(&value1));
 
   read(0, (unsigned char *)(&value1));

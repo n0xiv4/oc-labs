@@ -102,13 +102,11 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
 
       accessL2(MemAddress, &(L1Cache[index * BLOCK_SIZE]), MODE_WRITE); // then write back old block
     }
-
     memcpy(&(L1Cache[index * BLOCK_SIZE]), TempBlock, BLOCK_SIZE);
     Line->Valid = 1;
     Line->Tag = Tag;
     Line->Dirty = 0;
   } // if miss, then replaced with the correct block
-
 
   if (mode == MODE_READ) {    // read data from cache line
     memcpy(data, &(L1Cache[index * BLOCK_SIZE + offset]), WORD_SIZE);
@@ -142,9 +140,6 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
     }
   }
 
-  /* 
-  FIXME
-  */
   Tag = address >> (L2_2W_OFFSET_BITS + L2_2W_INDEX_BITS);
   offset = address & ((1 << L2_2W_OFFSET_BITS) - 1);
   set_index = (address >> L2_2W_OFFSET_BITS) & ((1 << L2_2W_INDEX_BITS) - 1);
@@ -232,6 +227,7 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
   
   // Define the pointer again as in the hit cases it wasn't defined yet
   CacheLine *Line = &l2_cache.lines[2 * set_index + set_line];
+  line_index = 2 * set_index + set_line;
 
   if (mode == MODE_READ) {
     memcpy(data, &(L2Cache[line_index * BLOCK_SIZE + offset]), WORD_SIZE);

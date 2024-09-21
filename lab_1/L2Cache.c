@@ -73,13 +73,6 @@ void accessL1(uint32_t address, uint8_t *data, uint32_t mode) {
   index = (address >> L1_OFFSET_BITS) & ((1 << L1_INDEX_BITS) - 1);
 
   /*
-  printf("memory address -> %p\n", address);
-  printf("tag -> %p\n", Tag);
-  printf("offset -> %p\n", offset);
-  printf("index -> %p\n", index);
-  */
-
-  /*
   We remove the offset bits so we get the exact place in memory
   where our block is located.
   */
@@ -199,7 +192,7 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
   } // if miss, then replaced with the correct block
 
 
-  if (mode == MODE_READ) {    // read data from cache line
+  if (mode == MODE_READ) { // read data from cache line
     memcpy(data, &(L2Cache[index * BLOCK_SIZE + offset]), WORD_SIZE);
     time += L2_READ_TIME;
   }
@@ -210,7 +203,6 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
     Line->Dirty = 1;
   }
 }
-
 
 void read(uint32_t address, uint8_t *data) {
   accessL1(address, data, MODE_READ);
