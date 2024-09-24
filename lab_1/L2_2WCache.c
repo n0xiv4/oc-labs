@@ -160,6 +160,7 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
   CacheLine *FirstLine = &l2_cache.lines[2 * set_index];
   CacheLine *SecondLine = &l2_cache.lines[2 * set_index + 1];
 
+  printf("actual tag -> %d\n", Tag);
   /*
   If we get a hit on any of the lines, we don't need to get
   anything from the DRAM, we can just read or write immediately.
@@ -168,7 +169,6 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
     // Hit - first line
     set_line = 0;
   }
-
   else if (SecondLine->Valid && SecondLine->Tag == Tag) {
     // Hit - second line
     set_line = 1;
@@ -204,6 +204,7 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
     index of the line we're working with.
     */
     line_index = 2 * set_index + set_line;
+    printf("line_index -> %d\n", line_index);
     CacheLine *Line = &l2_cache.lines[line_index];
 
   	if ((Line->Valid) && (Line->Dirty)) { // line has dirty block
@@ -228,6 +229,7 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
   // Define the pointer again as in the hit cases it wasn't defined yet
   CacheLine *Line = &l2_cache.lines[2 * set_index + set_line];
   line_index = 2 * set_index + set_line;
+  printf("%d\n", line_index);
 
   if (mode == MODE_READ) {
     memcpy(data, &(L2Cache[line_index * BLOCK_SIZE + offset]), WORD_SIZE);
@@ -246,8 +248,24 @@ void accessL2(uint32_t address, uint8_t *data, uint32_t mode) {
 
 void read(uint32_t address, uint8_t *data) {
   accessL1(address, data, MODE_READ);
+
+  printf("L2[0] = %d\n", l2_cache.lines[0].Tag);
+  printf("L2[0].valid = %d\n", l2_cache.lines[0].Valid);
+  printf("L2[0].time = %d\n", l2_cache.lines[0].Time);
+  printf("L2[1] = %d\n", l2_cache.lines[1].Tag);
+  printf("L2[1].valid = %d\n", l2_cache.lines[1].Valid);
+  printf("L2[1].time = %d\n", l2_cache.lines[1].Time);
+  printf("\n");
 }
 
 void write(uint32_t address, uint8_t *data) {
   accessL1(address, data, MODE_WRITE);
+
+  printf("L2[0] = %d\n", l2_cache.lines[0].Tag);
+  printf("L2[0].valid = %d\n", l2_cache.lines[0].Valid);
+  printf("L2[0].time = %d\n", l2_cache.lines[0].Time);
+  printf("L2[1] = %d\n", l2_cache.lines[1].Tag);
+  printf("L2[1].valid = %d\n", l2_cache.lines[1].Valid);
+  printf("L2[1].time = %d\n", l2_cache.lines[1].Time);
+  printf("\n");
 }
