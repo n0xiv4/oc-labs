@@ -1,7 +1,0 @@
-Start Time 0
-Wrote; Address 0; Value 1; Time 111
-Wrote; Address 16384; Value 1; Time 227
-Wrote; Address 32768; Value 1; Time 493
-Read; Address 0; Value 1; Time 759
-Read; Address 16384; Value 1; Time 870
-Read; Address 32768; Value 1; Time 881
