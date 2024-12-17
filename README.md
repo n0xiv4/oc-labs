@@ -47,10 +47,3 @@ read(32768, (unsigned char *)(&value4)); // 0x00008000
 ```
 
 Sendo que o valor de `value4`, após cada instrução de `read`, bate certo com os valores introduzidos nos `write`'s iniciais, percebemos que a última tarefa está a funcionar como pretendido, relativamente aos valores lidos. Percebemos melhor a utilização de tempo olhando para algumas instruções em específico - a primeira demora `111` unidades de tempo - `100t` ao ler o bloco da memória DRAM, `10t` ao ler esse bloco de L2, e `1t` ao escrever em L1. Já a última apenas demora `1t` uma vez que o endereço `0x00008000` tinha sido utilizado na última instrução, estando então naturalmente em L1. Nas outras instruções, de explicação mais complexa, os tempos também seguem o esperado de caches deste tipo - um *log* destas instruções pode ser lido em `debug.out`.
-
-### Trabalho realizado por
-
-Grupo 6
-- 106192 Filipe Oleacu,
-- 106459 Fábio Prata,
-- 106505 Rodrigo Salgueiro.
